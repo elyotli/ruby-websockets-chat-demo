@@ -39,6 +39,7 @@ module ChatDemo
 
         ws.on :close do |event|
           p [:close, ws.object_id, event.code, event.reason]
+          p event.reason
           @clients.delete(ws)
           ws = nil
         end
