@@ -17,7 +17,13 @@ module ChatDemo
       Thread.new do
         redis_sub = Redis.new(host: uri.host, port: uri.port, password: uri.password)
         redis_sub.subscribe(CHANNEL) do |on|
+          p "when are we actually declaring the subscription"
+          p "redis: #{@redis}"
+          p "redis_sub: #{redis_sub}"
           on.message do |channel, msg|
+            p 'yo we in on.message'
+            p channel
+            p msg
             @clients.each {|ws| ws.send(msg) }
           end
         end
@@ -34,12 +40,18 @@ module ChatDemo
 
         ws.on :message do |event|
           p [:message, event.data]
-          @redis.publish(CHANNEL, sanitize(event.data))
+          p @clients.size
+          # @redis.publish(CHANNEL, sanitize(event.data))
+          ws.send(sanitize(event.data))
+          @clients.each do |ws|
+            p sanitize(event.data)
+            ws.send(sanitize(event.data))
+            p 'we sent it!'
+          end
         end
 
         ws.on :close do |event|
           p [:close, ws.object_id, event.code, event.reason]
-          p event.reason
           @clients.delete(ws)
           ws = nil
         end
@@ -56,7 +68,6 @@ module ChatDemo
     def sanitize(message)
       json = JSON.parse(message)
       json.each {|key, value| json[key] = ERB::Util.html_escape(value) }
-      JSON.generate(json)
     end
   end
 end
