@@ -3,7 +3,8 @@ require 'sinatra/base'
 module ChatDemo
   class App < Sinatra::Base
     get "/" do
-      erb :"index.html"
+      # erb :"index.html"
+      erb :game
     end
 
     get "/assets/js/application.js" do
