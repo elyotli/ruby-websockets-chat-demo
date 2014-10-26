@@ -4,7 +4,7 @@ module ChatDemo
   class App < Sinatra::Base
     get "/" do
       # erb :"index.html"
-      erb :game
+      erb :"game.html"
     end
 
     get "/assets/js/application.js" do
