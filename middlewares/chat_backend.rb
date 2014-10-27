@@ -3,25 +3,15 @@ require 'thread'
 require 'redis'
 require 'json'
 require 'erb'
+require 'faker'
 
 module ChatDemo
   class ChatBackend
     KEEPALIVE_TIME = 15 # in seconds
-    # CHANNEL        = "chat-demo"
 
     def initialize(app)
       @app     = app
       @clients = []
-      # uri = URI.parse(ENV["REDISCLOUD_URL"])
-      # @redis = Redis.new(host: uri.host, port: uri.port, password: uri.password)
-      # Thread.new do
-      #   redis_sub = Redis.new(host: uri.host, port: uri.port, password: uri.password)
-      #   redis_sub.subscribe(CHANNEL) do |on|
-      #     on.message do |channel, msg|
-      #       @clients.each {|ws| ws.send(msg) }
-      #     end
-      #   end
-      # end
     end
 
     def call(env)
@@ -30,11 +20,14 @@ module ChatDemo
         ws.on :open do |event|
           p [:open, ws.object_id]
           @clients << ws
+
+          #Faker::Name.title
+          #Faker::App.name
         end
 
         ws.on :message do |event|
           p [:message, event.data]
-          # @redis.publish(CHANNEL, sanitize(event.data))
+
           @clients.each do |ws|
             ws.send(event.data)
           end
@@ -46,7 +39,6 @@ module ChatDemo
           ws = nil
         end
 
-        # Return async Rack response
         ws.rack_response
 
       else
@@ -54,10 +46,5 @@ module ChatDemo
       end
     end
 
-    # private
-    # def sanitize(message)
-    #   json = JSON.parse(message)
-    #   json.each {|key, value| json[key] = ERB::Util.html_escape(value) }
-    # end
   end
 end

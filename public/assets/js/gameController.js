@@ -14,7 +14,7 @@ $(function(){
 
   slap_button.on('click', function(event){
     event.preventDefault();
-    ws.send("click")
+    ws.send("click");
   })
 
 

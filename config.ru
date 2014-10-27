@@ -1,4 +1,4 @@
-require './app'
+require './app/app'
 require './middlewares/chat_backend'
 
 use ChatDemo::ChatBackend
